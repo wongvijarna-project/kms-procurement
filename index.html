@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบค้นหากฎหมายเกี่ยวกับการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ (KMS)</title>
+    <title>ระบบจัดการความรู้การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ (KMS)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Sarabun -->
@@ -70,9 +70,6 @@
                     <button id="nav-search" onclick="switchTab('search')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
                         <i class="fa-solid fa-magnifying-glass mr-1"></i> ค้นหากฎหมาย
                     </button>
-                    <button id="nav-graph" onclick="switchTab('graph')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
-                        <i class="fa-solid fa-diagram-project mr-1"></i> ผังความสัมพันธ์
-                    </button>
                     <button id="nav-compare" onclick="switchTab('compare')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
                         <i class="fa-solid fa-code-compare mr-1"></i> เปรียบเทียบข้อกฎหมาย
                     </button>
@@ -80,7 +77,7 @@
                         <i class="fa-solid fa-user-check mr-1"></i> อนุมัติเอกสาร
                         <span id="pending-badge" class="ml-1 px-1.5 py-0.5 text-xs bg-red-500 text-white rounded-full font-bold">2</span>
                     </button>
-                    <button id="nav-addlaw" onclick="switchTab('addlaw')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
+                    <button id="nav-addlaw" onclick="openAddLawTab()" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
                         <i class="fa-solid fa-circle-plus mr-1"></i> เพิ่มกฎหมายใหม่
                     </button>
                 </nav>
@@ -108,7 +105,7 @@
             <div class="bg-gradient-to-r from-navy-800 to-blue-900 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
                 <div class="relative z-10 max-w-3xl">
                     <span class="bg-amber-500 text-navy-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Enterprise Architecture Standard</span>
-                    <h2 class="text-3xl font-bold mt-3 mb-2">ระบบค้นหากฎหมายจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ</h2>
+                    <h2 class="text-3xl font-bold mt-3 mb-2">ศูนย์จัดการความรู้การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ</h2>
                     <p class="text-slate-200 text-sm mb-6">รวบรวมพระราชบัญญัติ กฎกระทรวง ระเบียบกระทรวงการคลัง หนังสือเวียน และมติ ครม. พร้อมระบบสืบค้นอัจฉริยะและการผูกโยงทางกฎหมาย</p>
                     
                     <!-- Search Input Bar -->
@@ -135,34 +132,34 @@
                 </div>
             </div>
 
-            <!-- Stats Overview Cards -->
+            <!-- Stats Overview Cards (คลิกเพื่อกรองดูรายการตามประเภท) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                <button onclick="filterByType('act')" class="text-left bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4 hover:border-blue-400 hover:shadow-md transition cursor-pointer">
                     <div class="p-3 bg-blue-100 text-blue-800 rounded-lg"><i class="fa-solid fa-book-bookmark text-2xl"></i></div>
                     <div>
                         <p class="text-xs text-slate-500 font-medium">พระราชบัญญัติ</p>
-                        <h3 class="text-2xl font-bold text-slate-800">1 <span class="text-xs font-normal text-slate-500">ฉบับหลัก</span></h3>
+                        <h3 class="text-2xl font-bold text-slate-800"><span id="stat-count-act">0</span> <span class="text-xs font-normal text-slate-500">ฉบับหลัก</span></h3>
                     </div>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                </button>
+                <button onclick="filterByType('rule')" class="text-left bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4 hover:border-amber-400 hover:shadow-md transition cursor-pointer">
                     <div class="p-3 bg-amber-100 text-amber-800 rounded-lg"><i class="fa-solid fa-file-contract text-2xl"></i></div>
                     <div>
                         <p class="text-xs text-slate-500 font-medium">กฎกระทรวง/ระเบียบ</p>
-                        <h3 class="text-2xl font-bold text-slate-800">12 <span class="text-xs font-normal text-slate-500">รายการ</span></h3>
+                        <h3 class="text-2xl font-bold text-slate-800"><span id="stat-count-rule">0</span> <span class="text-xs font-normal text-slate-500">รายการ</span></h3>
                     </div>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                </button>
+                <button onclick="filterByType('circular')" class="text-left bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4 hover:border-emerald-400 hover:shadow-md transition cursor-pointer">
                     <div class="p-3 bg-emerald-100 text-emerald-800 rounded-lg"><i class="fa-solid fa-envelope-open-text text-2xl"></i></div>
                     <div>
                         <p class="text-xs text-slate-500 font-medium">หนังสือเวียน (ว)</p>
-                        <h3 class="text-2xl font-bold text-slate-800">145 <span class="text-xs font-normal text-slate-500">ฉบับ</span></h3>
+                        <h3 class="text-2xl font-bold text-slate-800"><span id="stat-count-circular">0</span> <span class="text-xs font-normal text-slate-500">ฉบับ</span></h3>
                     </div>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                </button>
+                <div title="ยังไม่รองรับในระบบขณะนี้" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4 opacity-60 cursor-not-allowed">
                     <div class="p-3 bg-purple-100 text-purple-800 rounded-lg"><i class="fa-solid fa-building-columns text-2xl"></i></div>
                     <div>
                         <p class="text-xs text-slate-500 font-medium">มติคณะรัฐมนตรี</p>
-                        <h3 class="text-2xl font-bold text-slate-800">34 <span class="text-xs font-normal text-slate-500">เรื่อง</span></h3>
+                        <h3 class="text-2xl font-bold text-slate-800">0 <span class="text-xs font-normal text-slate-500">เรื่อง (เร็วๆ นี้)</span></h3>
                     </div>
                 </div>
             </div>
@@ -319,46 +316,6 @@
             </div>
         </section>
 
-        <!-- ==================== TAB 4: CITATION GRAPH & TIMELINE ==================== -->
-        <section id="tab-graph" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="border-b pb-4 mb-6">
-                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-diagram-project text-amber-500"></i> ผังความสัมพันธ์ทางกฎหมายและลำดับเวลา
-                    </h2>
-                    <p class="text-xs text-slate-500">แสดงลำดับขั้นชั้นกฎหมาย และหนังสือเวียนที่ออกอ้างอิงตามมาตราสำคัญ</p>
-                </div>
-
-                <!-- Interactive Visualization Mockup -->
-                <div class="bg-slate-900 rounded-xl p-8 text-white relative min-h-[380px] flex flex-col items-center justify-center">
-                    <!-- Top Parent Node -->
-                    <div class="bg-blue-800 border-2 border-amber-400 p-4 rounded-xl shadow-lg text-center max-w-sm mb-12">
-                        <span class="bg-amber-400 text-navy-900 text-[10px] font-bold px-2 py-0.5 rounded">กฎหมายแม่บท</span>
-                        <h4 class="font-bold text-sm mt-1">พ.ร.บ. จัดซื้อจัดจ้างฯ พ.ศ. ๒๕๖๐</h4>
-                        <p class="text-xs text-slate-300">มาตรา ๕๖ (วิธีเฉพาะเจาะจง)</p>
-                    </div>
-
-                    <!-- Connection Arrows -->
-                    <div class="w-1/2 h-8 border-t-2 border-l-2 border-r-2 border-amber-400/50 absolute top-28"></div>
-
-                    <!-- Child Nodes -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl z-10">
-                        <div class="bg-slate-800 border border-slate-600 p-4 rounded-lg text-center hover:border-amber-400 cursor-pointer transition" onclick="openDocDetail('d02')">
-                            <span class="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">หนังสือเวียนอ้างอิง</span>
-                            <h5 class="font-semibold text-xs mt-1 text-slate-100">หนังสือเวียน ว 119</h5>
-                            <p class="text-[11px] text-slate-400 mt-1">อ้างอิง มาตรา 56 (1)(ค) และ (2)(ง)</p>
-                            <span class="inline-block text-[10px] text-amber-400 underline mt-2">คลิกเพื่อดูรายละเอียด</span>
-                        </div>
-                        <div class="bg-slate-800 border border-slate-600 p-4 rounded-lg text-center hover:border-amber-400 cursor-pointer transition">
-                            <span class="bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">กฎกระทรวงลำดับรอง</span>
-                            <h5 class="font-semibold text-xs mt-1 text-slate-100">กฎกระทรวง กำหนดวงเงิน 2560</h5>
-                            <p class="text-[11px] text-slate-400 mt-1">กำหนดวงเงินเฉพาะเจาะจงไม่เกิน 5 แสนบาท</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- ==================== TAB 5: SIDE-BY-SIDE COMPARE ==================== -->
         <section id="tab-compare" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -399,14 +356,15 @@
         <section id="tab-addlaw" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-3xl mx-auto">
                 <div class="border-b pb-4 mb-6">
-                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <h2 id="addlaw-title" class="text-xl font-bold text-slate-800 flex items-center gap-2">
                         <i class="fa-solid fa-circle-plus text-emerald-600"></i> เพิ่มกฎหมาย/หนังสือเวียนใหม่เข้าระบบ
                     </h2>
-                    <p class="text-xs text-slate-500">ข้อมูลที่บันทึกจะถูกเก็บในฐานข้อมูลคลาวด์ (Firestore) และแสดงผลให้ผู้ใช้ทุกคนเห็นทันที</p>
+                    <p id="addlaw-subtitle" class="text-xs text-slate-500">ข้อมูลที่บันทึกจะถูกเก็บในฐานข้อมูลคลาวด์ (Firestore) และแสดงผลให้ผู้ใช้ทุกคนเห็นทันที • เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น</p>
                     <p id="db-status-label" class="text-xs mt-2 font-semibold"></p>
                 </div>
 
                 <form id="add-law-form" onsubmit="saveNewLaw(event)" class="space-y-4">
+                    <input type="hidden" id="form-doc-id" value="">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">เลขที่เอกสาร *</label>
@@ -465,7 +423,7 @@
                     <div class="pt-4 border-t flex items-center justify-end gap-3">
                         <button type="button" onclick="switchTab('search')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800">ยกเลิก</button>
                         <button id="save-law-btn" type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-6 py-2.5 rounded-lg flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลงฐานข้อมูล
+                            <i id="save-law-btn-icon" class="fa-solid fa-cloud-arrow-up"></i> <span id="save-law-btn-text">บันทึกลงฐานข้อมูล</span>
                         </button>
                     </div>
                 </form>
@@ -575,16 +533,68 @@
         // (Project Settings > General > Your apps > SDK setup and configuration)
         // ============================================================
         const firebaseConfig = {
-  apiKey: "AIzaSyBOU4oCW5gJpBzE8FPii0jhZPvyV0sDzP8",
-  authDomain: "kms-procurement.firebaseapp.com",
-  projectId: "kms-procurement",
-  storageBucket: "kms-procurement.firebasestorage.app",
-  messagingSenderId: "969489400170",
-  appId: "1:969489400170:web:6272a1591c1fb033546513"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         var db = null;
         var firebaseReady = false;
+
+        // ============================================================
+        // Admin PIN (แก้ไขรหัสนี้เป็นของคุณเอง)
+        // หมายเหตุ: นี่เป็นการป้องกันแค่ระดับกันคนทั่วไปกดพลาด
+        // ไม่ใช่ระบบความปลอดภัยจริง เพราะฝังอยู่ใน source code
+        // ============================================================
+        const ADMIN_PIN = "2569";
+
+        function verifyAdminPin() {
+            if (sessionStorage.getItem('kms_admin_verified') === 'true') return true;
+            const input = prompt('กรุณาใส่รหัส PIN สำหรับผู้ดูแลระบบ (Admin) เพื่อเพิ่ม/แก้ไขข้อมูลกฎหมาย:');
+            if (input === null) return false;
+            if (input === ADMIN_PIN) {
+                sessionStorage.setItem('kms_admin_verified', 'true');
+                return true;
+            }
+            alert('รหัส PIN ไม่ถูกต้อง ไม่สามารถเพิ่ม/แก้ไขข้อมูลได้');
+            return false;
+        }
+
+        // เปิดฟอร์มในโหมด "เพิ่มใหม่"
+        function openAddLawTab() {
+            if (!verifyAdminPin()) return;
+            document.getElementById('add-law-form').reset();
+            document.getElementById('form-doc-id').value = '';
+            document.getElementById('addlaw-title').innerHTML = '<i class="fa-solid fa-circle-plus text-emerald-600"></i> เพิ่มกฎหมาย/หนังสือเวียนใหม่เข้าระบบ';
+            document.getElementById('addlaw-subtitle').innerText = 'ข้อมูลที่บันทึกจะถูกเก็บในฐานข้อมูลคลาวด์ (Firestore) และแสดงผลให้ผู้ใช้ทุกคนเห็นทันที • เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น';
+            document.getElementById('save-law-btn-text').innerText = 'บันทึกลงฐานข้อมูล';
+            switchTab('addlaw');
+        }
+
+        // เปิดฟอร์มในโหมด "แก้ไข" พร้อมเติมข้อมูลเดิม
+        function openEditLawTab(docId) {
+            if (!verifyAdminPin()) return;
+            const doc = documentsData.find(d => d.id === docId);
+            if (!doc) { alert('ไม่พบเอกสารนี้'); return; }
+
+            document.getElementById('form-doc-id').value = doc.id;
+            document.getElementById('form-number').value = doc.number || '';
+            document.getElementById('form-date').value = doc.date || '';
+            document.getElementById('form-title').value = doc.title || '';
+            document.getElementById('form-type').value = doc.type || 'circular';
+            document.getElementById('form-agency').value = doc.agency || 'CGD';
+            document.getElementById('form-summary').value = doc.summary || '';
+            document.getElementById('form-fulltext').value = doc.fullText || '';
+            document.getElementById('form-tags').value = (doc.tags || []).join(', ');
+
+            document.getElementById('addlaw-title').innerHTML = '<i class="fa-solid fa-pen-to-square text-amber-600"></i> แก้ไขข้อมูลกฎหมาย/หนังสือเวียน';
+            document.getElementById('addlaw-subtitle').innerText = 'กำลังแก้ไข: ' + doc.number + ' • การเปลี่ยนแปลงจะมีผลกับทุกคนที่เข้าเว็บทันที';
+            document.getElementById('save-law-btn-text').innerText = 'บันทึกการแก้ไข';
+            switchTab('addlaw');
+        }
 
         // Seed data ใช้ตอนฐานข้อมูลว่างเปล่า (ครั้งแรกที่ตั้งระบบ) เท่านั้น
         const seedDocuments = [
@@ -628,6 +638,7 @@
                     statusLabel.className = 'text-xs mt-2 font-semibold text-amber-600';
                 }
                 renderSearchResults();
+                updateStatsCards();
                 return;
             }
 
@@ -659,6 +670,7 @@
                 }
                 documentsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderSearchResults();
+                updateStatsCards();
             }, (err) => {
                 console.error('Firestore listen error:', err);
             });
@@ -675,14 +687,26 @@
             }
         }
 
-        // บันทึกกฎหมาย/หนังสือเวียนใหม่ลงฐานข้อมูล
+        // บันทึกกฎหมาย/หนังสือเวียน (รองรับทั้งโหมดเพิ่มใหม่ และโหมดแก้ไข)
         async function saveNewLaw(event) {
             event.preventDefault();
+
+            // ป้องกันอีกชั้น เผื่อมีคนพยายามยิงฟอร์มตรงๆ โดยไม่ผ่านการยืนยัน PIN
+            if (sessionStorage.getItem('kms_admin_verified') !== 'true') {
+                alert('กรุณายืนยันตัวตนผู้ดูแลระบบ (Admin) ก่อน');
+                switchTab('search');
+                return;
+            }
+
             const btn = document.getElementById('save-law-btn');
+            const btnText = document.getElementById('save-law-btn-text');
+            const btnIcon = document.getElementById('save-law-btn-icon');
             const agencyMap = { CGD: 'กรมบัญชีกลาง', MOF: 'กระทรวงการคลัง' };
             const agency = document.getElementById('form-agency').value;
+            const editingId = document.getElementById('form-doc-id').value;
+            const isEditMode = !!editingId;
 
-            const newDoc = {
+            const docData = {
                 number: document.getElementById('form-number').value.trim(),
                 title: document.getElementById('form-title').value.trim(),
                 type: document.getElementById('form-type').value,
@@ -701,28 +725,39 @@
             }
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
+            btnIcon.className = 'fa-solid fa-spinner fa-spin';
+            btnText.innerText = 'กำลังบันทึก...';
 
             try {
-                await db.collection('documents').add({
-                    ...newDoc,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                if (isEditMode) {
+                    await db.collection('documents').doc(editingId).update({
+                        ...docData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('บันทึกการแก้ไขเรียบร้อยแล้ว ✅ ทุกคนที่เข้าเว็บจะเห็นข้อมูลที่อัปเดตทันที');
+                } else {
+                    await db.collection('documents').add({
+                        ...docData,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert('บันทึกกฎหมายใหม่เรียบร้อยแล้ว ✅ ทุกคนที่เข้าเว็บจะเห็นรายการนี้ทันที');
+                }
                 document.getElementById('add-law-form').reset();
-                alert('บันทึกกฎหมายใหม่เรียบร้อยแล้ว ✅ ทุกคนที่เข้าเว็บจะเห็นรายการนี้ทันที');
+                document.getElementById('form-doc-id').value = '';
                 switchTab('search');
             } catch (err) {
                 console.error('Save error:', err);
                 alert('เกิดข้อผิดพลาดในการบันทึก: ' + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลงฐานข้อมูล';
+                btnIcon.className = 'fa-solid fa-cloud-arrow-up';
+                btnText.innerText = isEditMode ? 'บันทึกการแก้ไข' : 'บันทึกลงฐานข้อมูล';
             }
         }
 
         // Navigation Tab Switcher
         function switchTab(tabId) {
-            ['dashboard', 'search', 'detail', 'graph', 'compare', 'admin', 'addlaw'].forEach(id => {
+            ['dashboard', 'search', 'detail', 'compare', 'admin', 'addlaw'].forEach(id => {
                 const el = document.getElementById(`tab-${id}`);
                 const navBtn = document.getElementById(`nav-${id}`);
                 if (el) el.classList.add('hidden');
@@ -745,6 +780,30 @@
 
         function quickFilterSearch(tag) {
             document.getElementById('main-search-input').value = tag;
+            switchTab('search');
+        }
+
+        // อัปเดตตัวเลขบน KPI card ให้ตรงกับข้อมูลจริงในฐานข้อมูล
+        function updateStatsCards() {
+            const counts = { act: 0, rule: 0, circular: 0 };
+            documentsData.forEach(doc => {
+                if (counts.hasOwnProperty(doc.type)) counts[doc.type]++;
+            });
+            const elAct = document.getElementById('stat-count-act');
+            const elRule = document.getElementById('stat-count-rule');
+            const elCircular = document.getElementById('stat-count-circular');
+            if (elAct) elAct.innerText = counts.act;
+            if (elRule) elRule.innerText = counts.rule;
+            if (elCircular) elCircular.innerText = counts.circular;
+        }
+
+        // คลิกที่ KPI card เพื่อกรองเฉพาะประเภทนั้นๆ ในหน้าค้นหา
+        function filterByType(type) {
+            document.querySelectorAll('.filter-type').forEach(cb => {
+                cb.checked = (cb.value === type);
+            });
+            document.getElementById('filter-agency').value = 'ALL';
+            document.getElementById('main-search-input').value = '';
             switchTab('search');
         }
 
@@ -833,8 +892,8 @@
                     <button class="bg-navy-800 hover:bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2">
                         <i class="fa-solid fa-file-pdf"></i> ดาวน์โหลด PDF ต้นฉบับ
                     </button>
-                    <button onclick="switchTab('graph')" class="text-xs text-blue-700 font-bold hover:underline flex items-center gap-1">
-                        <i class="fa-solid fa-diagram-project"></i> ดูผังความสัมพันธ์ทางกฎหมาย
+                    <button onclick="openEditLawTab('${doc.id}')" class="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square"></i> แก้ไขรายการนี้ (Admin)
                     </button>
                 </div>
             `;

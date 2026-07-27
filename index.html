@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการความรู้การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ (KMS)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; color: #1f2937; }
+        .diff-add { background-color: #d1fae5; color: #065f46; padding: 2px 4px; border-radius: 4px; }
+        .diff-del { background-color: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-navy-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo & Title -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="bg-amber-500 text-navy-900 p-2 rounded-lg font-bold">
+                        <i class="fa-solid fa-scale-balanced text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold leading-tight">ระบบ KMS จัดซื้อจัดจ้างภาครัฐ</h1>
+                        <p class="text-xs text-amber-400">พ.ร.บ. จัดซื้อจัดจ้างฯ พ.ศ. ๒๕๖๐ & ระเบียบปฏิบัติ</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex space-x-1 text-sm font-medium">
+                    <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-2 rounded-md bg-navy-900 text-amber-400">
+                        <i class="fa-solid fa-house mr-1"></i> หน้าหลัก
+                    </button>
+                    <button id="nav-search" onclick="switchTab('search')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
+                        <i class="fa-solid fa-magnifying-glass mr-1"></i> ค้นหากฎหมาย
+                    </button>
+                    <button id="nav-graph" onclick="switchTab('graph')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
+                        <i class="fa-solid fa-diagram-project mr-1"></i> ผังความสัมพันธ์
+                    </button>
+                    <button id="nav-compare" onclick="switchTab('compare')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200">
+                        <i class="fa-solid fa-code-compare mr-1"></i> เปรียบเทียบข้อกฎหมาย
+                    </button>
+                    <button id="nav-admin" onclick="switchTab('admin')" class="px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200 relative">
+                        <i class="fa-solid fa-user-check mr-1"></i> อนุมัติเอกสาร
+                        <span id="pending-badge" class="ml-1 px-1.5 py-0.5 text-xs bg-red-500 text-white rounded-full font-bold">2</span>
+                    </button>
+                </nav>
+
+                <!-- User Profile & Quick Action -->
+                <div class="flex items-center space-x-3">
+                    <div class="hidden sm:flex flex-col text-right">
+                        <span class="text-sm font-semibold">นาวา เจ้าหน้าที่พัสดุ</span>
+                        <span class="text-xs text-slate-300">กรมบัญชีกลาง (Approver)</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-amber-500 text-navy-900 flex items-center justify-center font-bold text-sm shadow">
+                        นว
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-navy-800 to-blue-900 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="bg-amber-500 text-navy-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Enterprise Architecture Standard</span>
+                    <h2 class="text-3xl font-bold mt-3 mb-2">ศูนย์จัดการความรู้การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ</h2>
+                    <p class="text-slate-200 text-sm mb-6">รวบรวมพระราชบัญญัติ กฎกระทรวง ระเบียบกระทรวงการคลัง หนังสือเวียน และมติ ครม. พร้อมระบบสืบค้นอัจฉริยะและการผูกโยงทางกฎหมาย</p>
+                    
+                    <!-- Search Input Bar -->
+                    <div class="flex flex-col sm:flex-row gap-2 bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/20">
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                            <input id="hero-search-input" type="text" placeholder="พิมพ์คำค้นหา เช่น 'วิธีเฉพาะเจาะจง', 'ว 119', 'ราคากลาง งานก่อสร้าง'..." 
+                                class="w-full pl-11 pr-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <button onclick="executeHeroSearch()" class="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-search"></i> ค้นหาด่วน
+                        </button>
+                    </div>
+
+                    <!-- Popular Tags -->
+                    <div class="flex flex-wrap items-center gap-2 mt-4 text-xs">
+                        <span class="text-amber-400 font-medium">คำค้นฮิต:</span>
+                        <button onclick="quickFilterSearch('มาตรา 56')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md text-slate-200 transition">มาตรา 56</button>
+                        <button onclick="quickFilterSearch('วิธีเฉพาะเจาะจง')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md text-slate-200 transition">วิธีเฉพาะเจาะจง</button>
+                        <button onclick="quickFilterSearch('ว 119')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md text-slate-200 transition">หนังสือเวียน ว 119</button>
+                        <button onclick="quickFilterSearch('ราคากลาง')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md text-slate-200 transition">ราคากลาง</button>
+                        <button onclick="quickFilterSearch('อุทธรณ์')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md text-slate-200 transition">การอุทธรณ์</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="p-3 bg-blue-100 text-blue-800 rounded-lg"><i class="fa-solid fa-book-bookmark text-2xl"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">พระราชบัญญัติ</p>
+                        <h3 class="text-2xl font-bold text-slate-800">1 <span class="text-xs font-normal text-slate-500">ฉบับหลัก</span></h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="p-3 bg-amber-100 text-amber-800 rounded-lg"><i class="fa-solid fa-file-contract text-2xl"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">กฎกระทรวง/ระเบียบ</p>
+                        <h3 class="text-2xl font-bold text-slate-800">12 <span class="text-xs font-normal text-slate-500">รายการ</span></h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-100 text-emerald-800 rounded-lg"><i class="fa-solid fa-envelope-open-text text-2xl"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">หนังสือเวียน (ว)</p>
+                        <h3 class="text-2xl font-bold text-slate-800">145 <span class="text-xs font-normal text-slate-500">ฉบับ</span></h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="p-3 bg-purple-100 text-purple-800 rounded-lg"><i class="fa-solid fa-building-columns text-2xl"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">มติคณะรัฐมนตรี</p>
+                        <h3 class="text-2xl font-bold text-slate-800">34 <span class="text-xs font-normal text-slate-500">เรื่อง</span></h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Highlights -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Top Searched Laws -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-fire text-amber-500"></i> กฎหมาย/หนังสือเวียนยอดนิยม
+                        </h3>
+                        <button onclick="switchTab('search')" class="text-xs text-blue-700 font-medium hover:underline">ดูทั้งหมด</button>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        <div class="py-3 flex items-start justify-between cursor-pointer hover:bg-slate-50 p-2 rounded-lg" onclick="openDocDetail('d01')">
+                            <div>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">พ.ร.บ. ๒๕๖๐</span>
+                                <h4 class="font-semibold text-slate-800 text-sm mt-1">มาตรา ๕๖ : การจัดซื้อจัดจ้างโดยวิธีคัดเลือกและวิธีเฉพาะเจาะจง</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">กระทรวงการคลัง • ยอดเข้าชม 14,250 ครั้ง</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-300 text-sm mt-2"></i>
+                        </div>
+                        <div class="py-3 flex items-start justify-between cursor-pointer hover:bg-slate-50 p-2 rounded-lg" onclick="openDocDetail('d02')">
+                            <div>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">หนังสือเวียน (ว)</span>
+                                <h4 class="font-semibold text-slate-800 text-sm mt-1">หนังสือเวียน กค (กวจ) 0405.2/ว 119 (โรคติดเชื้อโควิด-19)</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">กรมบัญชีกลาง • ยอดเข้าชม 9,820 ครั้ง</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-300 text-sm mt-2"></i>
+                        </div>
+                        <div class="py-3 flex items-start justify-between cursor-pointer hover:bg-slate-50 p-2 rounded-lg" onclick="openDocDetail('d03')">
+                            <div>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-100 text-purple-800">ระเบียบ</span>
+                                <h4 class="font-semibold text-slate-800 text-sm mt-1">ระเบียบกระทรวงการคลังว่าด้วยการจัดซื้อจัดจ้างฯ พ.ศ. ๒๕๖๐ ข้อ ๗๙</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">กระทรวงการคลัง • ยอดเข้าชม 7,410 ครั้ง</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-300 text-sm mt-2"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latest Legislative Updates -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> อัปเดตล่าสุด
+                        </h3>
+                        <span class="text-xs text-slate-400">อัปเดตเรียลไทม์</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex gap-3 border-l-2 border-amber-500 pl-3 py-1">
+                            <div>
+                                <span class="text-xs text-slate-400">9 มีนาคม 2563</span>
+                                <h4 class="text-sm font-semibold text-slate-800">ประกาศใช้ หนังสือเวียน ว 119</h4>
+                                <p class="text-xs text-slate-600 mt-0.5">ซ้อมเข้าใจการจัดซื้อจัดจ้างพัสดุฉุกเฉิน ยืนยันอำนาจการจัดซื้อตามมาตรา 56 (1)(ค) และ (2)(ง)</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 border-l-2 border-emerald-500 pl-3 py-1">
+                            <div>
+                                <span class="text-xs text-slate-400">23 สิงหาคม 2560</span>
+                                <h4 class="text-sm font-semibold text-slate-800">การมีผลบังคับใช้ พ.ร.บ. จัดซื้อจัดจ้างฯ พ.ศ. ๒๕๖๐</h4>
+                                <p class="text-xs text-slate-600 mt-0.5">มีผลบังคับใช้ครอบคลุมทุกหน่วยงานรัฐ รัฐวิสาหกิจ และองค์กรปกครองส่วนท้องถิ่น</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: ENTERPRISE SEARCH ==================== -->
+        <section id="tab-search" class="hidden space-y-6">
+            <!-- Search Header Bar -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-3 items-center justify-between">
+                <div class="relative w-full md:w-2/3">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400"></i>
+                    <input id="main-search-input" type="text" placeholder="พิมพ์คำค้นหา หรือ เลขที่หนังสือเวียน..." value="วิธีเฉพาะเจาะจง" 
+                        onkeyup="renderSearchResults()" class="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-navy-800 focus:outline-none">
+                </div>
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <span class="text-xs text-slate-500" id="result-count-label">พบ 2 รายการ (0.05 วินาที)</span>
+                    <button class="px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 flex items-center gap-1 font-medium">
+                        <i class="fa-solid fa-file-export"></i> ส่งออก PDF/Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Two-Column Layout: Sidebar Filter + Search Results -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Left Sidebar Filters -->
+                <aside class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-6 h-fit">
+                    <div class="flex items-center justify-between border-b pb-3">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-amber-500"></i> ตัวกรองค้นหา
+                        </h3>
+                        <button onclick="resetFilters()" class="text-xs text-blue-600 hover:underline">ล้างตัวกรอง</button>
+                    </div>
+
+                    <!-- Filter 1: Law Type -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-2">ประเภทกฎหมาย</label>
+                        <div class="space-y-1.5 text-xs text-slate-600">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" checked onchange="renderSearchResults()" class="filter-type rounded text-navy-800 focus:ring-navy-800" value="act">
+                                <span>พระราชบัญญัติ (พ.ร.บ.)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" checked onchange="renderSearchResults()" class="filter-type rounded text-navy-800 focus:ring-navy-800" value="circular">
+                                <span>หนังสือเวียน (ว)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" onchange="renderSearchResults()" class="filter-type rounded text-navy-800 focus:ring-navy-800" value="rule">
+                                <span>ระเบียบกระทรวงการคลัง</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Filter 2: Issuing Agency -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-2">หน่วยงานที่ออก</label>
+                        <select onchange="renderSearchResults()" id="filter-agency" class="w-full border border-slate-300 rounded-lg p-2 text-xs text-slate-700 focus:ring-navy-800">
+                            <option value="ALL">ทั้งหมดทุกหน่วยงาน</option>
+                            <option value="CGD">กรมบัญชีกลาง</option>
+                            <option value="MOF">กระทรวงการคลัง</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter 3: Tags -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-2">หัวข้อ/แท็ก</label>
+                        <div class="flex flex-wrap gap-1">
+                            <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-md cursor-pointer font-medium">#วิธีเฉพาะเจาะจง</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md cursor-pointer hover:bg-slate-200">#ราคากลาง</span>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md cursor-pointer hover:bg-slate-200">#โควิด19</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Search Results List -->
+                <div class="lg:col-span-3 space-y-4" id="search-results-container">
+                    <!-- Dynamic Search Cards Generated Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: DOCUMENT DETAIL HUB ==================== -->
+        <section id="tab-detail" class="hidden space-y-6">
+            <button onclick="switchTab('search')" class="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> กลับไปหน้าการสืบค้น
+            </button>
+
+            <div id="document-detail-content" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 space-y-6">
+                <!-- Content Loaded Dynamically via JS -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: CITATION GRAPH & TIMELINE ==================== -->
+        <section id="tab-graph" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="border-b pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-diagram-project text-amber-500"></i> ผังความสัมพันธ์ทางกฎหมายและลำดับเวลา
+                    </h2>
+                    <p class="text-xs text-slate-500">แสดงลำดับขั้นชั้นกฎหมาย และหนังสือเวียนที่ออกอ้างอิงตามมาตราสำคัญ</p>
+                </div>
+
+                <!-- Interactive Visualization Mockup -->
+                <div class="bg-slate-900 rounded-xl p-8 text-white relative min-h-[380px] flex flex-col items-center justify-center">
+                    <!-- Top Parent Node -->
+                    <div class="bg-blue-800 border-2 border-amber-400 p-4 rounded-xl shadow-lg text-center max-w-sm mb-12">
+                        <span class="bg-amber-400 text-navy-900 text-[10px] font-bold px-2 py-0.5 rounded">กฎหมายแม่บท</span>
+                        <h4 class="font-bold text-sm mt-1">พ.ร.บ. จัดซื้อจัดจ้างฯ พ.ศ. ๒๕๖๐</h4>
+                        <p class="text-xs text-slate-300">มาตรา ๕๖ (วิธีเฉพาะเจาะจง)</p>
+                    </div>
+
+                    <!-- Connection Arrows -->
+                    <div class="w-1/2 h-8 border-t-2 border-l-2 border-r-2 border-amber-400/50 absolute top-28"></div>
+
+                    <!-- Child Nodes -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl z-10">
+                        <div class="bg-slate-800 border border-slate-600 p-4 rounded-lg text-center hover:border-amber-400 cursor-pointer transition" onclick="openDocDetail('d02')">
+                            <span class="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">หนังสือเวียนอ้างอิง</span>
+                            <h5 class="font-semibold text-xs mt-1 text-slate-100">หนังสือเวียน ว 119</h5>
+                            <p class="text-[11px] text-slate-400 mt-1">อ้างอิง มาตรา 56 (1)(ค) และ (2)(ง)</p>
+                            <span class="inline-block text-[10px] text-amber-400 underline mt-2">คลิกเพื่อดูรายละเอียด</span>
+                        </div>
+                        <div class="bg-slate-800 border border-slate-600 p-4 rounded-lg text-center hover:border-amber-400 cursor-pointer transition">
+                            <span class="bg-purple-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">กฎกระทรวงลำดับรอง</span>
+                            <h5 class="font-semibold text-xs mt-1 text-slate-100">กฎกระทรวง กำหนดวงเงิน 2560</h5>
+                            <p class="text-[11px] text-slate-400 mt-1">กำหนดวงเงินเฉพาะเจาะจงไม่เกิน 5 แสนบาท</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: SIDE-BY-SIDE COMPARE ==================== -->
+        <section id="tab-compare" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="border-b pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-code-compare text-blue-600"></i> เครื่องมือเปรียบเทียบข้อกฎหมาย (Side-by-Side Compare)
+                    </h2>
+                    <p class="text-xs text-slate-500">เปรียบเทียบข้อความเดิมตาม พ.ร.บ. กับแนวทางปฏิบัติยกเว้นตามหนังสือเวียนแก้ไข</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left: Original Version -->
+                    <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
+                        <div class="flex items-center justify-between border-b pb-2 mb-3">
+                            <span class="font-bold text-xs text-slate-700">ข้อความเดิม: พ.ร.บ. มาตรา ๕๖ (๒) (ข)</span>
+                            <span class="px-2 py-0.5 bg-slate-200 text-slate-700 text-[10px] font-bold rounded">v1.0 (2017)</span>
+                        </div>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            การจัดซื้อจัดจ้างพัสดุที่มีการผลิต จำหน่าย หรือให้บริการทั่วไป และมีวงเงินในการจัดซื้อจัดจ้างครั้งหนึ่ง <span class="diff-del">ไม่เกินวงเงินตามที่กำหนดในกฎกระทรวง</span> ให้ใช้วิธีเฉพาะเจาะจงได้...
+                        </p>
+                    </div>
+
+                    <!-- Right: Amended Version -->
+                    <div class="border border-emerald-200 rounded-xl p-5 bg-emerald-50/40">
+                        <div class="flex items-center justify-between border-b border-emerald-200 pb-2 mb-3">
+                            <span class="font-bold text-xs text-emerald-900">แนวทางผ่อนผัน: หนังสือเวียน ว 119</span>
+                            <span class="px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-bold rounded">v1.1 (2020)</span>
+                        </div>
+                        <p class="text-sm text-slate-800 leading-relaxed">
+                            กรณีจัดซื้อจัดจ้างเพื่อป้องกัน โรคโควิด-19 <span class="diff-add">ให้ได้รับยกเว้นการจัดทำแผนประจำปี</span> และสามารถจัดซื้อจัดจ้างโดย <span class="diff-add">วิธีเฉพาะเจาะจงได้ทันทีโดยไม่จำกัดวงเงิน</span> ตามมาตรา 56 (1)(ค)...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 6: ADMIN CMS APPROVAL PIPELINE ==================== -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between border-b pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-user-check text-emerald-600"></i> ระบบตรวจสอบและอนุมัติเอกสารกฎหมาย (Admin CMS)
+                        </h2>
+                        <p class="text-xs text-slate-500">สำหรับผู้ตรวจสอบ (Approver) พิจารณาร่างเอกสารก่อนเผยแพร่ลงระบบ</p>
+                    </div>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">สถานะผู้ใช้: Approver</span>
+                </div>
+
+                <!-- Approval Queue Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-bold">
+                            <tr>
+                                <th class="p-3">ชื่อเรื่องร่างเอกสาร</th>
+                                <th class="p-3">ผู้จัดทำ (Editor)</th>
+                                <th class="p-3">วันที่ยื่น</th>
+                                <th class="p-3">สถานะ</th>
+                                <th class="p-3 text-right">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200" id="admin-table-body">
+                            <tr id="admin-row-1">
+                                <td class="p-3 font-semibold text-slate-800">ร่างหนังสือเวียน กำหนดแนวทางราคากลางปี 2567</td>
+                                <td class="p-3">บรรณาธิการ A</td>
+                                <td class="p-3">10 ก.ค. 2026</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs font-bold rounded">รออนุมัติ</span></td>
+                                <td class="p-3 text-right space-x-1">
+                                    <button onclick="approveDraft('admin-row-1')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded">อนุมัติ</button>
+                                    <button onclick="rejectDraft('admin-row-1')" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded">ส่งกลับ</button>
+                                </td>
+                            </tr>
+                            <tr id="admin-row-2">
+                                <td class="p-3 font-semibold text-slate-800">ร่างแก้ไขเพิ่มเติม ระเบียบการพัสดุ ข้อ 79 (ฉบับปรับปรุง)</td>
+                                <td class="p-3">บรรณาธิการ B</td>
+                                <td class="p-3">12 ก.ค. 2026</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs font-bold rounded">รออนุมัติ</span></td>
+                                <td class="p-3 text-right space-x-1">
+                                    <button onclick="approveDraft('admin-row-2')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded">อนุมัติ</button>
+                                    <button onclick="rejectDraft('admin-row-2')" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded">ส่งกลับ</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating AI Citation Assistant Widget -->
+    <div class="fixed bottom-5 right-5 z-50">
+        <!-- AI Toggle Button -->
+        <button onclick="toggleAIPanel()" class="bg-navy-800 hover:bg-blue-900 text-amber-400 p-4 rounded-full shadow-2xl flex items-center gap-2 border-2 border-amber-500 font-bold transition-transform hover:scale-105">
+            <i class="fa-solid fa-robot text-xl"></i>
+            <span class="hidden sm:inline text-sm text-white">ผู้ช่วย AI กฎหมาย</span>
+        </button>
+
+        <!-- AI Panel Window -->
+        <div id="ai-panel" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden h-[460px]">
+            <!-- AI Header -->
+            <div class="bg-navy-800 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-robot text-amber-400 text-lg"></i>
+                    <div>
+                        <h4 class="font-bold text-sm">ผู้ช่วย AI กฎหมายพัสดุ (RAG)</h4>
+                        <p class="text-[10px] text-slate-300">ตอบอ้างอิงจากฐานข้อมูลจริง 100%</p>
+                    </div>
+                </div>
+                <button onclick="toggleAIPanel()" class="text-slate-300 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- AI Chat Body -->
+            <div id="ai-chat-body" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-slate-50">
+                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                    <p class="text-slate-800 font-medium">สวัสดีครับ! ผมคือผู้ช่วย AI กฎหมายพัสดุ สามารถสอบถามเรื่อง พ.ร.บ. จัดซื้อจัดจ้างฯ หรือหนังสือเวียนได้เลยครับ</p>
+                </div>
+            </div>
+
+            <!-- AI Input Box -->
+            <div class="p-3 border-t bg-white flex gap-2">
+                <input id="ai-input" type="text" placeholder="พิมพ์คำถามเกี่ยวกับวิธีเฉพาะเจาะจง..." 
+                    onkeydown="if(event.key==='Enter') sendAIMessage()"
+                    class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-navy-800 focus:outline-none">
+                <button onclick="sendAIMessage()" class="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold px-3 py-2 rounded-lg text-xs">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial Dataset
+        const documentsData = [
+            {
+                id: 'd01',
+                number: 'พ.ร.บ. จัดซื้อจัดจ้างฯ ๒๕๖๐ (มาตรา ๕๖)',
+                title: 'พระราชบัญญัติการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ. ๒๕๖๐ - มาตรา ๕๖',
+                type: 'act',
+                agency: 'MOF',
+                agencyName: 'กระทรวงการคลัง',
+                date: '23 ส.ค. 2560',
+                status: 'มีผลบังคับใช้',
+                summary: 'กำหนดเงื่อนไขการจัดซื้อจัดจ้างโดยวิธีเฉพาะเจาะจง กรณีวงเงินไม่เกินกำหนดในกฎกระทรวง หรือกรณีมีความจำเป็นฉุกเฉินเนื่องจากภัยธรรมชาติหรืออุบัติภัย',
+                fullText: 'มาตรา ๕๖ การจัดซื้อจัดจ้างพัสดุ ให้หน่วยงานของรัฐเลือกใช้วิธีประกาศเชิญชวนทั่วไปก่อน เว้นแต่ (๑) กรณีวิธีคัดเลือก... (๒) กรณีวิธีเฉพาะเจาะจง (ข) การจัดซื้อจัดจ้างพัสดุที่มีการผลิต จำหน่าย หรือให้บริการทั่วไป และมีวงเงินในการจัดซื้อจัดจ้างครั้งหนึ่งไม่เกินวงเงินตามที่กำหนดในกฎกระทรวง...',
+                tags: ['วิธีเฉพาะเจาะจง', 'มาตรา 56', 'พ.ร.บ. 2560']
+            },
+            {
+                id: 'd02',
+                number: 'หนังสือเวียน กค (กวจ) 0405.2/ว 119',
+                title: 'แนวทางปฏิบัติในการจัดซื้อจัดจ้างพัสดุเพื่อการป้องกัน ควบคุม หรือรักษาโรคติดเชื้อไวรัสโคโรนา 2019',
+                type: 'circular',
+                agency: 'CGD',
+                agencyName: 'กรมบัญชีกลาง',
+                date: '9 มี.ค. 2563',
+                status: 'มีผลบังคับใช้',
+                summary: 'ซ้อมเข้าใจการจัดซื้อจัดจ้างกรณีฉุกเฉินและจำเป็นเร่งด่วน ตามมาตรา 56 (1)(ค) และมาตรา 56 (2)(ง) ให้จัดซื้อได้ทันทีโดยวิธีเฉพาะเจาะจงและยกเว้นการจัดทำแผนประจำปี',
+                fullText: 'ด้วยสถานการณ์การแพร่ระบาดของโรคโควิด-19 คณะกรรมการวินิจฉัยปัญหาการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ จึงกำหนดแนวทางปฏิบัติการจัดทำหนังสือเชิญชวนและการอนุมัติจัดซื้อจัดจ้างโดยวิธีเฉพาะเจาะจง...',
+                tags: ['วิธีเฉพาะเจาะจง', 'โควิด-19', 'ว 119']
+            }
+        ];
+
+        // Navigation Tab Switcher
+        function switchTab(tabId) {
+            ['dashboard', 'search', 'detail', 'graph', 'compare', 'admin'].forEach(id => {
+                const el = document.getElementById(`tab-${id}`);
+                const navBtn = document.getElementById(`nav-${id}`);
+                if (el) el.classList.add('hidden');
+                if (navBtn) navBtn.className = "px-3 py-2 rounded-md hover:bg-blue-800 text-slate-200 text-sm font-medium";
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) activeNav.className = "px-3 py-2 rounded-md bg-navy-900 text-amber-400 text-sm font-medium";
+
+            if (tabId === 'search') renderSearchResults();
+        }
+
+        // Search Execution
+        function executeHeroSearch() {
+            const query = document.getElementById('hero-search-input').value;
+            document.getElementById('main-search-input').value = query;
+            switchTab('search');
+        }
+
+        function quickFilterSearch(tag) {
+            document.getElementById('main-search-input').value = tag;
+            switchTab('search');
+        }
+
+        function renderSearchResults() {
+            const query = document.getElementById('main-search-input').value.toLowerCase();
+            const agencyFilter = document.getElementById('filter-agency').value;
+            const checkedTypes = Array.from(document.querySelectorAll('.filter-type:checked')).map(cb => cb.value);
+
+            const container = document.getElementById('search-results-container');
+            container.innerHTML = '';
+
+            const filtered = documentsData.filter(doc => {
+                const matchQuery = doc.title.toLowerCase().includes(query) || doc.summary.toLowerCase().includes(query) || doc.number.toLowerCase().includes(query);
+                const matchAgency = agencyFilter === 'ALL' || doc.agency === agencyFilter;
+                const matchType = checkedTypes.includes(doc.type);
+                return matchQuery && matchAgency && matchType;
+            });
+
+            document.getElementById('result-count-label').innerText = `พบ ${filtered.length} รายการ (0.05 วินาที)`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="bg-white p-8 rounded-xl text-center text-slate-500">ไม่พบเอกสารกฎหมายที่ตรงกับเงื่อนไขการค้นหา</div>`;
+                return;
+            }
+
+            filtered.forEach(doc => {
+                const card = `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-amber-500 transition space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded ${doc.type === 'act' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'}">
+                                ${doc.number}
+                            </span>
+                            <span class="text-xs text-slate-400">บังคับใช้: ${doc.date}</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base hover:text-navy-800 cursor-pointer" onclick="openDocDetail('${doc.id}')">${doc.title}</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">${doc.summary}</p>
+                        <div class="flex items-center justify-between pt-2 border-t text-xs">
+                            <div class="flex gap-1">
+                                ${doc.tags.map(t => `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded">#${t}</span>`).join('')}
+                            </div>
+                            <button onclick="openDocDetail('${doc.id}')" class="text-navy-800 font-bold hover:underline flex items-center gap-1">
+                                อ่านฉบับเต็ม <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('.filter-type').forEach(cb => cb.checked = true);
+            document.getElementById('filter-agency').value = 'ALL';
+            document.getElementById('main-search-input').value = '';
+            renderSearchResults();
+        }
+
+        // Open Detail View
+        function openDocDetail(id) {
+            const doc = documentsData.find(d => d.id === id) || documentsData[0];
+            const container = document.getElementById('document-detail-content');
+
+            container.innerHTML = `
+                <div class="border-b pb-4 space-y-2">
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">${doc.status}</span>
+                        <span class="text-xs text-slate-500">หน่วยงาน: ${doc.agencyName}</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">${doc.title}</h2>
+                    <p class="text-xs text-slate-400">เลขที่: ${doc.number} | ประกาศวันที่: ${doc.date}</p>
+                </div>
+
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                    <h4 class="font-bold text-sm text-amber-900 mb-1">📌 สรุปสาระสำคัญ (Executive Summary)</h4>
+                    <p class="text-xs text-amber-800 leading-relaxed">${doc.summary}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-bold text-sm text-slate-800">📜 เนื้อหาฉบับเต็ม (Full Text)</h4>
+                    <div class="p-4 bg-slate-50 border rounded-lg text-xs leading-relaxed text-slate-700 whitespace-pre-line">
+                        ${doc.fullText}
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t flex flex-wrap items-center justify-between gap-3">
+                    <button class="bg-navy-800 hover:bg-blue-900 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf"></i> ดาวน์โหลด PDF ต้นฉบับ
+                    </button>
+                    <button onclick="switchTab('graph')" class="text-xs text-blue-700 font-bold hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-diagram-project"></i> ดูผังความสัมพันธ์ทางกฎหมาย
+                    </button>
+                </div>
+            `;
+
+            switchTab('detail');
+        }
+
+        // Admin Approval Logic
+        function approveDraft(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) {
+                row.querySelector('td:nth-child(4)').innerHTML = `<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded">เผยแพร่แล้ว</span>`;
+                row.querySelector('td:nth-child(5)').innerHTML = `<span class="text-xs text-slate-400 italic">เสร็จสิ้น</span>`;
+                updatePendingBadge();
+            }
+        }
+
+        function rejectDraft(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) {
+                row.querySelector('td:nth-child(4)').innerHTML = `<span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs font-bold rounded">ส่งกลับแก้ไข</span>`;
+                row.querySelector('td:nth-child(5)').innerHTML = `<span class="text-xs text-slate-400 italic">เสร็จสิ้น</span>`;
+                updatePendingBadge();
+            }
+        }
+
+        function updatePendingBadge() {
+            const badge = document.getElementById('pending-badge');
+            let current = parseInt(badge.innerText);
+            if (current > 0) badge.innerText = current - 1;
+        }
+
+        // Floating AI Assistant Logic
+        function toggleAIPanel() {
+            const panel = document.getElementById('ai-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('ai-input');
+            const body = document.getElementById('ai-chat-body');
+            const q = input.value.trim();
+            if (!q) return;
+
+            // User message
+            body.innerHTML += `
+                <div class="bg-blue-800 text-white p-2.5 rounded-lg shadow-sm ml-6">
+                    <p>${q}</p>
+                </div>
+            `;
+            input.value = '';
+
+            // Simulated AI response with RAG citation
+            setTimeout(() => {
+                body.innerHTML += `
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm space-y-2">
+                        <p class="text-slate-800">การดำเนินการวิธีเฉพาะเจาะจง สามารถกระทำได้ตาม <strong>มาตรา ๕๖ (๒) (ข)</strong> แห่ง พ.ร.บ. จัดซื้อจัดจ้างฯ พ.ศ. ๒๕๖๐ หรือกรณีฉุกเฉินตาม <strong>หนังสือเวียน ว 119</strong> ครับ</p>
+                        <div class="p-2 bg-amber-50 rounded border border-amber-200 text-[11px]">
+                            <span class="font-bold text-amber-900">🔗 แหล่งอ้างอิง:</span>
+                            <br><a href="#" onclick="openDocDetail('d01')" class="text-blue-700 underline">• มาตรา ๕๖ พ.ร.บ. ๒๕๖٠</a>
+                            <br><a href="#" onclick="openDocDetail('d02')" class="text-blue-700 underline">• หนังสือเวียน ว 119</a>
+                        </div>
+                    </div>
+                `;
+                body.scrollTop = body.scrollHeight;
+            }, 600);
+        }
+    </script>
+</body>
+</html>

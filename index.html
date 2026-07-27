@@ -574,17 +574,17 @@
         // แก้ค่าด้านล่างนี้ให้เป็นค่าจริงจาก Firebase Console ของคุณ
         // (Project Settings > General > Your apps > SDK setup and configuration)
         // ============================================================
-        const firebaseConfig = firebaseConfig = {
-  apiKey: "AIzaSyBOU4oCW5gJpBzE8FPii0jhZPvyV0sDzP8",
-  authDomain: "kms-procurement.firebaseapp.com",
-  projectId: "kms-procurement",
-  storageBucket: "kms-procurement.firebasestorage.app",
-  messagingSenderId: "969489400170",
-  appId: "1:969489400170:web:6272a1591c1fb033546513"
-};
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-        let db = null;
-        let firebaseReady = false;
+        var db = null;
+        var firebaseReady = false;
 
         // Seed data ใช้ตอนฐานข้อมูลว่างเปล่า (ครั้งแรกที่ตั้งระบบ) เท่านั้น
         const seedDocuments = [
